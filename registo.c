@@ -15,20 +15,25 @@ typedef struct funcionario
 } Funcionario;
 
 
+// Criação do arquivo CSV
 void criar_csv(Funcionario vet[], int quant, char *nome_arquivo){
+    int k;
 
     FILE *csv = fopen(nome_arquivo, "w");
 
-    if (csv == NULL){
+    if (csv == NULL){   //Caso dê erro ao criar arquivo
         printf("Erro ao criar arquivo");
         return;
     }
 
-    fprintf("id,nome,salario,idade\n");
+    fprintf(csv, "id,nome,salario,idade\n");  //cabeçalho do CSV
 
+    for(k = 0; k < quant; k++){  //Preenchimento do arquivo
+        fprintf(csv, "%d,%s,%.2f,%d\n", vet[k].id, vet[k].nome, vet[k].salario, vet[k].idade);
+    }
 
-
-
+    fclose(csv);
+    printf("Arquivo criado com sucesso\n");
 }
 
 
@@ -72,7 +77,7 @@ void exibir_todos(Funcionario vet[], int cadastrados){
         printf("NOME : %s\n", vet[i].nome);
         printf("IDADE : %d\n", vet[i].idade);
         printf("SALÁRIO : %.2f\n", vet[i].salario);
-        printf("-------------------------------------------------------------");
+        printf("-------------------------------------------------------------\n");
     }
 }
 
@@ -107,7 +112,8 @@ int main(){
     SetConsoleOutputCP(CP_UTF8);
     Funcionario vetor[MAX];
     int cadastrados;
-    char action;
+    char action, arquivo_csv[100] = "registros_funcionarios.csv";
+    
 
     int id_cad, idade_cad;
     char nome_cad[TOTAL];
@@ -118,7 +124,7 @@ int main(){
     printf("----------Bem vindo----------\n\n");
 
     while(1){
-        printf("\nDigite o número correspondente para qual operação deseja realizar:\n1 - Adicionar registro\n2 - Remover registro\n3 - Buscar registro\n4 - Exibir todos os registros\n5+ - Sair\n");
+        printf("\nDigite o número correspondente para qual operação deseja realizar:\n1 - Adicionar registro\n2 - Remover registro\n3 - Buscar registro\n4 - Exibir todos os registros\n5 - Criar arquivo CSV\n6+ - Sair do programa\n");
         scanf(" %c", &action);
         switch (action)
         {
@@ -153,6 +159,10 @@ int main(){
 
         case '4':
             exibir_todos(vetor, cadastrados);
+            break;
+
+        case '5':
+            criar_csv(vetor, cadastrados, &arquivo_csv);
             break;
 
         default:
