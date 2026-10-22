@@ -4,15 +4,136 @@
 #include <windows.h>
 
 #define TOTAL 50
-#define MAX 15
 
-typedef struct funcionario
+typedef struct Funcionario
 {
     int id;
     char nome[TOTAL];
     float salario;
     int idade;
+    struct Funcionario *proximo;
+    
 } Funcionario;
+
+
+
+//Aloca a memória a ser utilzada pelo struct, e preenche os campos do Funcionario
+Funcionario* cadastrar_funcionario(int id, char nome[], int idade, float salario){
+    Funcionario* novo = malloc(sizeof(Funcionario));
+    if (novo == NULL){
+        printf("Sem espaço na memória!");
+        return;
+    }
+    novo->id = id;
+    strcpy(novo->nome, nome);
+    novo->idade = idade;
+    novo->salario = salario;
+
+    return novo;
+} 
+
+
+
+//Recebe as informações para o campo Funcionário e adiciona na lista;
+void adicionar_na_lista(Funcionario **cabeça, int id, char nome[], int idade, float salario){
+
+    //chama função para criação do registro com os dados recebidos
+    Funcionario *func = cadastrar_funcionario(id, nome, idade, salario);
+    
+    if (func == NULL) return; 
+
+    Funcionario *atual = *cabeça;
+
+    while (atual->proximo != NULL){
+        atual = atual->proximo;
+    }
+
+    atual->proximo = func;
+    
+}
+
+
+
+void buscar_funcionarioID(Funcionario **cabeça, int id){
+    
+    if (cabeça == NULL){
+        printf("Nenhum funcionário cadastrado.\n");
+        return;
+    }
+
+    Funcionario *atual = *cabeça;
+    while(atual->id != id){
+        atual = atual->proximo;
+    }
+
+    if(atual == NULL){
+        printf("Funcionário com ID %d não encontrado.\n", id);
+        return;
+    }
+
+    //seria interessante criar uma função só pra exibir essas informações não é??
+    printf("\n---------------------FUNCIONÁRIO ID %d-----------------------\n", id);
+    printf("NOME : %s\n", atual->nome);
+    printf("IDADE : %d\n", atual->idade);
+    printf("SALÁRIO : %.2f\n", atual->salario);
+    printf("-------------------------------------------------------------\n");
+}
+
+
+
+void exibir_todos(Funcionario **cabeça){
+    if (cabeça == NULL){
+        printf("Nenhum funcionário cadastrado.\n");
+        return;
+    }
+
+    Funcionario *atual = *cabeça;
+
+    //Aqui é usado o "for", mas também poderia ser um "while"
+
+    for (atual; atual != NULL; atual = atual->proximo){
+        printf("---------------------FUNCIONÁRIO ID %d-----------------------\n", atual->id);
+        printf("NOME : %s\n", atual->nome);
+        printf("IDADE : %d\n", atual->idade);
+        printf("SALÁRIO : %.2f\n", atual->salario);
+        printf("-------------------------------------------------------------\n");
+    }
+}
+
+
+//Limpa a lista e libera as memórias que estavam alocadas
+void limpar_lista(int **cabeça){
+    Funcionario *atual = *cabeça;
+
+    while(atual != NULL){
+        Funcionario *limpar = atual;
+        atual = atual->proximo;
+        free(limpar);
+    }
+}
+
+
+void remover_funcionario(Funcionario **cabeça, int id) {
+    Funcionario *atual = *cabeça;
+    Funcionario *anterior = NULL;
+    
+    while(atual->id != id){
+        anterior = atual;
+        atual = atual->proximo;
+    }
+
+    //caso não encontre funcionário
+    if(atual == NULL){
+        printf("Funcionário com ID %d não encontrado\n", id);
+        return;
+    }
+
+    anterior->proximo = atual->proximo;
+
+
+
+    free(atual);
+}
 
 
 // Criação do arquivo CSV
@@ -38,88 +159,18 @@ void criar_csv(Funcionario vet[], int quant, char *nome_arquivo){
 
 
 
-
-void adicionar_funcionario(Funcionario vet[], int *cadastro, int id, char nome[], int idade, float salario){
-    if (*cadastro >= MAX){
-        printf("Vetor cheio! Não é possível adicionar mais funcionários.\n");
-        return;
-    }
-    vet[*cadastro].id = id;
-    strcpy(vet[*cadastro].nome, nome);
-    vet[*cadastro].idade = idade;
-    vet[*cadastro].salario = salario;
-    (*cadastro)++;
-}
-
-void buscar_funcionarioID(Funcionario vet[], int cadastrados, int id){
-    int k = 0;
-    while (k < cadastrados && vet[k].id != id){
-        k++;
-    }
-    if (k == cadastrados) {
-        printf("Funcionário com ID %d não encontrado.\n", id);
-        return;
-    }
-    printf("---------------------FUNCIONÁRIO ID %d-----------------------\n", id);
-    printf("NOME : %s\n", vet[k].nome);
-    printf("IDADE : %d\n", vet[k].idade);
-    printf("SALÁRIO : %.2f\n", vet[k].salario);
-    printf("-------------------------------------------------------------");
-}
-
-void exibir_todos(Funcionario vet[], int cadastrados){
-    if (cadastrados == 0){
-        printf("Nenhum funcionário cadastrado.\n");
-        return;
-    }
-    for (int i = 0; i < cadastrados; i++){
-        printf("---------------------FUNCIONÁRIO ID %d-----------------------\n", vet[i].id);
-        printf("NOME : %s\n", vet[i].nome);
-        printf("IDADE : %d\n", vet[i].idade);
-        printf("SALÁRIO : %.2f\n", vet[i].salario);
-        printf("-------------------------------------------------------------\n");
-    }
-}
-
-void zerar_vetor(int *total){
-    *total = 0;
-}
-
-void remover_funcionario(Funcionario vet[], int *cadastro, int id) {
-    int k = 0;
-
-    while(k < *cadastro && vet[k].id != id){
-        k++;
-    }
-
-    //caso não encontre funcionário
-    if(k == *cadastro){
-        printf("Funcionário com ID %d não encontrado\n", id);
-        return;
-    }
-    //remoção do cadastro informado e "empurrando" os demais para o início da lista
-    for(int i = k; i < *cadastro - 1; i++){
-        vet[i] = vet[i + 1];
-    }
-    //subtrai 1 no número de cadastrados
-    (*cadastro)--;
-    printf("Funcionário com ID %d removido com sucesso\n", id);
-}
-
 int main(){
 
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
-    Funcionario vetor[MAX];
-    int cadastrados;
+    Funcionario vetor;
     char action, arquivo_csv[100] = "registros_funcionarios.csv";
-    
 
     int id_cad, idade_cad;
     char nome_cad[TOTAL];
     float salario_cad;
 
-    zerar_vetor(&cadastrados);
+    limpar_lista(&cadastrados);
 
     printf("----------Bem vindo----------\n\n");
 
@@ -141,7 +192,7 @@ int main(){
             printf("Digite o salário do funcionário: ");
             scanf("%f", &salario_cad);
 
-            adicionar_funcionario(vetor, &cadastrados, id_cad, nome_cad, idade_cad, salario_cad);
+            adicionar_na_lista(vetor, &cadastrados, id_cad, nome_cad, idade_cad, salario_cad);
             break;
 
         case '2':
