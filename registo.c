@@ -67,8 +67,6 @@ void adicionar_na_lista(Funcionario **cabeca, int id, char nome[], int idade, fl
         atual->proximo = func;
     }
     exibir_funcionario(func);
-
-    printf("Funcionario exibido com sucesso!");
 }
 
 void buscar_funcionarioID(Funcionario **cabeca, int id){
@@ -190,7 +188,7 @@ int main(){
     char nome_cad[TOTAL];
     float salario_cad;
 
-    printf("----------Bem vindo----------\n\n");
+    printf("-----------------------Bem vindo-----------------------\n\n");
 
     while(1){
         printf("\nDigite o número correspondente para qual operação deseja realizar:\n1 - Adicionar registro\n2 - Remover registro\n3 - Buscar registro\n4 - Exibir todos os registros\n5 - Criar arquivo CSV\n6 - Limpar lista\n7+ - Sair do programa\n");
